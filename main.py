@@ -324,9 +324,11 @@ class App(DataMixin, StyleMixin, JournalMixin, LedgerMixin, WorksheetMixin):
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.withdraw()  # hide the window while the app builds
     try:
         root.iconbitmap(resource_path("logo.ico"))
     except tk.TclError:
         pass  # icon file missing: keep the default icon
     App(root)
+    root.deiconify()  # show the window once everything is built
     root.mainloop()
