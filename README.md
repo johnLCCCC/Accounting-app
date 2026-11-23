@@ -44,5 +44,4 @@ python main.py
 
 ## More documentation
 
-`PRODUCT.md` (what the app does), `ARCHITECTURE.md` (how it is built and known issues), `DESIGN.md` (visual rules),
-`MEMORY.md` (current state and decisions), `AI_GUIDE.md` (rules for AI assistants and developers), `SESSION_HANDOFF.md` (latest status).
+`PRODUCT.md` (what the app does), `ARCHITECTURE.md` (how it is built and known issues), `DESIGN.md` (visual rules).
