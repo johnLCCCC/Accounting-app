@@ -207,7 +207,10 @@ class JournalTable(ttk.Frame):
 
         n = len(rows)
         total_h = n * self.row_h
-        b.configure(scrollregion=(0, 0, self.total_w, total_h + 7))
+        view_h = max(b.winfo_height(), 1)
+        b.configure(scrollregion=(0, 0, self.total_w, max(total_h + 7, view_h)))
+        if total_h + 7 <= view_h:
+            b.yview_moveto(0)
 
         # Update header checkbox state
         self._update_header_checkbox_state()

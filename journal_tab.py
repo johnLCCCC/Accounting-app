@@ -11,7 +11,7 @@ from constants import ASSET, TYPES, date_to_display
 from style import (
     BG_ALT, BG_PANEL, BORDER, BORDER_STRONG, PRIMARY, PRIMARY_HOVER, PRIMARY_FOCUS,
     TEXT, TEXT_INVERTED, TEXT_MUTED,
-    COLOR_DANGER, COLOR_DANGER_LIGHT, COLOR_SUCCESS, COLOR_SUCCESS_LIGHT,
+    COLOR_DANGER, COLOR_DANGER_LIGHT, COLOR_SUCCESS, COLOR_SUCCESS_LIGHT, COLOR_BG_PANEL,
     F_MONO,
     SP1, SP2, SP3, SP4, SP5, SP6,
     fmt_amt,
@@ -266,7 +266,7 @@ class JournalMixin:
         search_bar = ttk.Frame(tab, style="Panel.TFrame", padding=(SP4, SP3))
         search_bar.pack(fill="x", padx=SP6, pady=(SP3, SP4))
 
-        ttk.Label(search_bar, text="⌕  Search", style="Muted.TLabel", background=BG_PANEL).pack(side="left", padx=(0, SP3))
+        ttk.Label(search_bar, text="⌕  Search", style="Muted.TLabel", background=COLOR_BG_PANEL).pack(side="left", padx=(0, SP3))
         self._search_placeholder = "Search journal entries..."
         self.v_search = tk.StringVar(value=self._search_placeholder)
         self.v_search.trace_add("write", lambda *_: self.apply_search_filter())
@@ -347,7 +347,7 @@ class JournalMixin:
         ttk.Label(search_bar, textvariable=self.search_info, style="Counter.TLabel").pack(side="left")
 
         # ─── Selection Toolbar (shows when entries are selected) ───────────────
-        self.selection_toolbar = ttk.Frame(tab)
+        self.selection_toolbar = ttk.Frame(tab, style="Panel.TFrame")
         # Initially hidden - will show when selections exist
         self.selection_count_var = tk.StringVar(value="")
         ttk.Label(self.selection_toolbar, textvariable=self.selection_count_var, style="Muted.TLabel").pack(side="left", padx=(SP6, SP3))
@@ -794,6 +794,7 @@ class JournalMixin:
 
     def clear_search(self):
         self.v_search.set(self._search_placeholder)
+        self.refresh()
 
     def _search_focus_in(self, _event=None):
         if self.v_search.get() == self._search_placeholder:

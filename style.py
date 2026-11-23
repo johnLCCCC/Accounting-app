@@ -20,7 +20,8 @@ COLOR_PRIMARY_FOCUS = "#D5E1EE"
 
 COLOR_SUCCESS = "#397DC1"
 COLOR_SUCCESS_LIGHT = "#EAF2FB"
-COLOR_DANGER = "#397DC1"
+COLOR_DANGER = "#DF4E4E"
+COLOR_DANGER_HOVER_BUTTON = "#E86A6A"    
 COLOR_DANGER_LIGHT = "#EAF2FB"
 COLOR_WARNING = "#397DC1"
 COLOR_WARNING_LIGHT = "#D9ECFF"
@@ -29,6 +30,7 @@ COLOR_ACCENT = "#397DC1"
 COLOR_ACCENT_HOVER = "#4B88C5"
 COLOR_ACCENT_PRESSED = "#4B88C5"
 COLOR_ACCENT_LIGHT = "#EAF2FB"
+COLOR_OF_ADJ = "#D2D9E1"
 
 # Spacing (base 4px) — Compact but comfortable (between current and team version)
 SPACE_1 = 4
@@ -89,6 +91,7 @@ PRIMARY_HOVER = COLOR_PRIMARY_HOVER
 PRIMARY_FOCUS = COLOR_PRIMARY_FOCUS
 WARNING = COLOR_WARNING
 WARNING_LIGHT = COLOR_WARNING_LIGHT
+BG_OF_ADJ = COLOR_OF_ADJ
 
 # Accent aliases
 ACCENT = COLOR_ACCENT
@@ -206,27 +209,27 @@ class StyleMixin:
 
         s.configure(
             "Ghost.TButton",
-            background="#F8FBFF",
-            foreground=COLOR_TEXT,
-            font=(FONT_UI, 12),  # Was 11
-            borderwidth=1,
-            padding=(SPACE_3, SPACE_2),
-        )
-        s.map("Ghost.TButton",
-            background=[("active", COLOR_BG_ALT), ("pressed", COLOR_BORDER)],
-            bordercolor=[("active", COLOR_BORDER_STRONG)],
-        )
-
-        s.configure(
-            "Danger.TButton",
             background=COLOR_PRIMARY,
             foreground=COLOR_TEXT_INVERTED,
             font=(FONT_UI, 12, "bold"),  # Was 11
             borderwidth=0,
             padding=(SPACE_3, SPACE_2),
         )
-        s.map("Danger.TButton",
+        s.map("Ghost.TButton",
             background=[("active", COLOR_PRIMARY_HOVER), ("pressed", COLOR_PRIMARY_HOVER)],
+            bordercolor=[("active", COLOR_PRIMARY_HOVER), ("pressed", COLOR_PRIMARY_HOVER)],
+        )
+
+        s.configure(
+            "Danger.TButton",
+            background=COLOR_DANGER,
+            foreground=COLOR_TEXT_INVERTED,
+            font=(FONT_UI, 12, "bold"),  # Was 11
+            borderwidth=0,
+            padding=(SPACE_3, SPACE_2),
+        )
+        s.map("Danger.TButton",
+            background=[("active", COLOR_DANGER_HOVER_BUTTON), ("pressed", COLOR_DANGER_HOVER_BUTTON)],
         )
 
         # ─── Combobox ──────────────────────────────────────────────────

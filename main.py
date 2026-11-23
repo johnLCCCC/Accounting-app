@@ -135,6 +135,11 @@ class App(DataMixin, StyleMixin, JournalMixin, LedgerMixin, WorksheetMixin):
 
         # Clear journal entry form (View > Refresh should clear input boxes)
         self.clear_journal_form()
+        # Clear table selection and put focus back on the table, like a fresh start
+        if hasattr(self, 'jt'):
+            self.jt.clear_selection()
+            self._on_selection_changed(0, "")
+            self.jt.body.focus_set()        
 
     def clear_journal_form(self):
         """Clear all journal entry form fields."""
@@ -300,18 +305,18 @@ class App(DataMixin, StyleMixin, JournalMixin, LedgerMixin, WorksheetMixin):
         from tkinter import messagebox
         shortcuts = (
             "Keyboard Shortcuts:\n\n"
-            "Ctrl + N     - New Entry (focus debit account)\n"
-            "Ctrl + F     - Search (Journal tab)\n"
+            "Ctrl + N   - New Entry (focus debit account)\n"
+            "Ctrl + F   - Search (Journal tab)\n"
             "Del        - Delete selected entry\n"
             "F5         - Refresh\n"
             "Enter      - Submit form (when editing)\n"
             "Escape     - Close dialogs\n"
             "Tab        - Navigate fields\n"
-            "Click      - Unlock field for editing\n"
+            "Click         - Unlock field for editing\n"
             "Click outside - Lock all fields\n"
-            "Ctrl + click - Select entries, one at a time\n"
+            "Ctrl + click  - Select entries, one at a time\n"
             "Shift + click - Select entries, one at a time\n"
-            "Ctrl + A - Select all entries\n"
+            "Ctrl + A      - Select all entries\n"
             "\nNote: Data saves automatically on every change."
         )
         messagebox.showinfo("Keyboard Shortcuts", shortcuts)
