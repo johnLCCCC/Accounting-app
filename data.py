@@ -6,7 +6,7 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from tkinter import messagebox
 
-from constants import CHART, DATA_FILE, ASSET, LIAB, CAP, DRAW, REV, EXP
+from constants import CHART, DATA_FILE, ASSET, LIAB, CAP, DRAW, REV, EXP, TYPES
 
 MAX_BACKUPS = 20
 
@@ -77,16 +77,32 @@ class DataMixin:
             entry.setdefault("desc", "")
 
             valid_entries.append(entry)
-
+        # Custom accounts must have a known type; set any unknown type to Asset (the app's default)
+        fixed_types = []
+        for name, acct_type in custom.items():
+            if acct_type not in TYPES:
+                custom[name] = ASSET
+                fixed_types.append(name)
+        self.fixed_custom_types = fixed_types
         return valid_entries, custom, skipped
 
     def load(self):
         self.load_failed = False  # Reset at start
+        self.load_skipped = False  # True when some entries in the file were skipped
+        self.fixed_custom_types = []  # Accounts whose unknown type was set to Asset
         try:
             with open(DATA_FILE, encoding="utf-8") as f:
                 d = json.load(f)
             self.entries, self.custom, skipped = self._validate_data(d)
             self.sync_custom_accounts()  # Clean up orphaned custom accounts on load
+            self.load_skipped = skipped > 0
+            if self.fixed_custom_types:
+                messagebox.showwarning(
+                    "Account Type Warning",
+                    "These accounts had an unknown type and were set to Asset:\n\n"
+                    + "\n".join(self.fixed_custom_types)
+                    + "\n\nCheck the data file if this is wrong."
+                )
             if skipped > 0:
                 messagebox.showwarning(
                     "Data Load Warning",
@@ -240,6 +256,14 @@ class DataMixin:
         try:
             # Build JSON text first (if dumps fails, nothing on disk is touched)
             text = json.dumps({"entries": self.entries, "custom": self.custom}, indent=2)
+            # If the file had skipped entries, keep a copy of the ORIGINAL file before
+            # this save overwrites it. If the copy fails, the OSError below stops the save.
+            if getattr(self, "load_skipped", False) and os.path.exists(DATA_FILE):
+                stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+                skipped_path = os.path.join(os.path.dirname(DATA_FILE),
+                                            f"accounting_data.skipped.{stamp}.json")
+                shutil.copy2(DATA_FILE, skipped_path)
+                self.load_skipped = False  # Only keep one copy per load
             # Create backup, comparing against the new content we're about to write
             self._create_backup(text.encode('utf-8'))
             # Write to temp file in the same folder

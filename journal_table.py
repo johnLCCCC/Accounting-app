@@ -198,6 +198,12 @@ class JournalTable(ttk.Frame):
             x = self.xs[col_idx + 1] - SP2
         return x
 
+    def drop_hidden_selections(self):
+        """Forget selected rows that are no longer shown (for example, hidden by a search)."""
+        visible = {f"{e}_{lt}" for e, lt, _, _ in self._rows}
+        self._selected_iids &= visible
+        self._exit_selection_mode_if_empty()
+
     def set_rows(self, rows, preserve_selection=False):
         """rows = list of (entry_idx, line_type, values, tags)
         line_type: 'debit', 'credit', 'desc', 'separator'"""

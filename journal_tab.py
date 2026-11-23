@@ -481,9 +481,11 @@ class JournalMixin:
             if not txt:
                 return False, "Amount is required", self.e_amt
             amt = Decimal(txt)
-            if not amt.is_finite() or amt <= 0:
+            if not amt.is_finite():
                 raise InvalidOperation
-            amt = amt.quantize(Decimal("0.01"))
+            amt = amt.quantize(Decimal("0.01"))  # round to centavos FIRST
+            if amt <= 0:                          # then check, so 0.004 is rejected
+                raise InvalidOperation
         except InvalidOperation:
             return False, "Enter a valid positive amount (e.g., 1000.00)", self.e_amt
 
@@ -532,7 +534,7 @@ class JournalMixin:
         elif self._status_kind == "success":
             fill, outline, foreground = COLOR_SUCCESS_LIGHT, BORDER_STRONG, COLOR_SUCCESS
         else:
-            fill, outline, foreground = BG_PANEL, BG_PANEL, TEXT_MUTED
+            fill, outline, foreground = BG_ALT, BORDER_STRONG, TEXT
 
         radius = 4
         points = []
@@ -647,13 +649,14 @@ class JournalMixin:
             self.refresh()
             return
 
-        # Save succeeded
+        # Save succeeded. Refresh FIRST, because refresh() clears the status line;
+        # the success message has to be set after it or it is wiped out at once.
+        self._editing_index = None
+        self.refresh()
         if is_edit:
             self._show_success("Entry updated")
         else:
             self._show_success("Entry added")
-        self._editing_index = None
-        self.refresh()
 
         # Clear form and focus debit account
         for v in (self.v_dr, self.v_cr, self.v_amt, self.v_desc):
@@ -689,11 +692,12 @@ class JournalMixin:
     def edit_entry(self, entry_idx=None):
         """Edit an entry. If entry_idx is None, use current selection."""
         if entry_idx is None:
-            sel = self.jt.get_selection()
-            if not sel:
+            selected = self.jt.get_selections()
+            if not selected:
                 return self._journal_dialog("Edit", "Click an entry in the journal first.")
-            # Parse entry_idx from selection
-            entry_idx = int(sel.split("_")[0])
+            if len(selected) > 1:
+                return self._journal_dialog("Edit", "Select only one entry to edit.")
+            entry_idx = selected[0]
 
         entry = self.entries[entry_idx]
 
@@ -719,19 +723,18 @@ class JournalMixin:
         self._editing_index = entry_idx
         self.cb_month.focus_set()
         self._status_kind = "muted"
-        self.status_var.set(f"Editing entry {entry_idx + 1}. Modify values and click 'Update Entry' to save, or 'Cancel' to discard.")
+        self.status_var.set("Editing this entry. Change the values, then click 'Update Entry' to save, or 'Cancel' to discard.")
         # Show cancel button, delete button, change add button text
         self.add_btn.configure(text="Update Entry")
         self.cancel_btn.pack(side="right", padx=(0, SP3))
         self.delete_btn.pack(side="right", padx=(0, SP3))
 
     def delete_entry(self):
-        """Delete single entry (backward compatible - uses current selection)."""
-        sel = self.jt.get_selection()
-        if not sel:
+        """Delete all selected entries (same as the Delete key)."""
+        selected = self.jt.get_selections()
+        if not selected:
             return self._journal_dialog("Delete", "Select an entry first.")
-        entry_idx = int(sel.split("_")[0])
-        self.delete_multiple_entries([entry_idx])
+        self.delete_multiple_entries(selected)
 
     def delete_multiple_entries(self, entry_indices):
         """Delete multiple entries by index."""
@@ -858,3 +861,6 @@ class JournalMixin:
                 rows.append((i, "separator", ("", "", "", ""), ("separator",)))
 
         self.jt.set_rows(rows)
+        # Entries hidden by the search must not stay selected (Delete would remove them)
+        self.jt.drop_hidden_selections()
+        self._on_selection_changed(0, "")
