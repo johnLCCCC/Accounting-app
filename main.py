@@ -22,6 +22,14 @@ from ledger_tab import LedgerMixin
 from style import StyleMixin
 from worksheet_tab import WorksheetMixin
 
+import os
+import sys
+
+def resource_path(name):
+    """Find a bundled file both when running the .py and when running the packaged .exe."""
+    base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base, name)
+
 
 class App(DataMixin, StyleMixin, JournalMixin, LedgerMixin, WorksheetMixin):
     def __init__(self, root):
@@ -308,5 +316,9 @@ class App(DataMixin, StyleMixin, JournalMixin, LedgerMixin, WorksheetMixin):
 
 if __name__ == "__main__":
     root = tk.Tk()
+    try:
+        root.iconbitmap(resource_path("logo.ico"))
+    except tk.TclError:
+        pass  # icon file missing: keep the default icon
     App(root)
     root.mainloop()
