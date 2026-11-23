@@ -80,6 +80,7 @@ class JournalTable(ttk.Frame):
         self.body.bind("<Delete>", self._on_delete_key)
         self.body.bind("<Control-a>", self._on_select_all)
         self.body.bind("<Escape>", self._on_escape)
+        self.body.bind("<ButtonPress-1>", lambda e: self.body.focus_set(), add="+")
 
         self.body.bind("<Configure>", self._on_resize)
         self.body.focus_set()  # Allow keyboard events
@@ -463,6 +464,11 @@ class JournalTable(ttk.Frame):
                 entry_indices.add(entry_idx)
             self._delete_callback(sorted(entry_indices))
 
+    def _notify_selection_changed(self):
+        """Tell the Journal tab that the selection changed, so its toolbar updates."""
+        if self._select_callback:
+            self._select_callback(0, "")
+
     def _on_select_all(self, event):
         """Handle Ctrl+A to select all entries (debit lines only)."""
         self._selected_iids = set()
@@ -474,6 +480,7 @@ class JournalTable(ttk.Frame):
         self._anchor_iid = None
         self.set_rows(self._rows, preserve_selection=True)
         self._exit_selection_mode_if_empty()
+        self._notify_selection_changed()        
 
     def _on_escape(self, event):
         """Handle Escape to clear selection."""
@@ -481,6 +488,7 @@ class JournalTable(ttk.Frame):
             self._selected_iids.clear()
             self._anchor_iid = None
             self.set_rows(self._rows, preserve_selection=True)
+            self._notify_selection_changed()
             self._exit_selection_mode_if_empty()
 
     def _on_double_click(self, event):

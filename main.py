@@ -300,8 +300,8 @@ class App(DataMixin, StyleMixin, JournalMixin, LedgerMixin, WorksheetMixin):
         from tkinter import messagebox
         shortcuts = (
             "Keyboard Shortcuts:\n\n"
-            "Ctrl+N     - New Entry (focus debit account)\n"
-            "Ctrl+F     - Search (Journal tab)\n"
+            "Ctrl + N     - New Entry (focus debit account)\n"
+            "Ctrl + F     - Search (Journal tab)\n"
             "Del        - Delete selected entry\n"
             "F5         - Refresh\n"
             "Enter      - Submit form (when editing)\n"
@@ -309,6 +309,9 @@ class App(DataMixin, StyleMixin, JournalMixin, LedgerMixin, WorksheetMixin):
             "Tab        - Navigate fields\n"
             "Click      - Unlock field for editing\n"
             "Click outside - Lock all fields\n"
+            "Ctrl + click - Select entries, one at a time\n"
+            "Shift + click - Select entries, one at a time\n"
+            "Ctrl + A - Select all entries\n"
             "\nNote: Data saves automatically on every change."
         )
         messagebox.showinfo("Keyboard Shortcuts", shortcuts)

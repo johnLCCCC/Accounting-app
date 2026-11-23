@@ -766,9 +766,9 @@ class JournalMixin:
             # Save succeeded
             self.refresh()
             # Clear selection in journal table
-            self.jt._selected_iids.clear()
-            self.jt._anchor_iid = None
-            self.jt.set_rows(self.jt._rows, preserve_selection=True)
+            self.jt.clear_selection()
+            self._on_selection_changed(0, "")
+            self.jt.body.focus_set()
             self._show_success(f"{count} entry{'s' if count > 1 else ''} deleted")
 
     def _on_selection_changed(self, _entry_idx, _line_type):
@@ -790,6 +790,7 @@ class JournalMixin:
         """Clear selection button in selection toolbar."""
         self.jt.clear_selection()
         self._on_selection_changed(0, "")
+        self.jt.body.focus_set()
 
     def clear_search(self):
         self.v_search.set(self._search_placeholder)
